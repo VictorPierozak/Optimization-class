@@ -26,3 +26,6 @@ matrix testowa_lab_4(matrix x, matrix ud1, matrix ud2);
 
 matrix grad_testowa_lab_4(matrix x, matrix ud1, matrix ud2);
 matrix hess_testowa_lab_4(matrix x, matrix ud1, matrix ud2);
+
+matrix ff_lab4(matrix x, matrix y, matrix theta);
+matrix df_lab4(matrix x, matrix y, matrix theta);

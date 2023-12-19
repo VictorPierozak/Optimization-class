@@ -274,40 +274,47 @@ double h0(matrix x, matrix theta)
 }
 
 
-matrix ff_lab4(matrix x, matrix y, matrix theta)
+matrix ff_lab4(matrix theta, matrix y, matrix x)
 {
 	matrix J(1, 1, 0.0);
 
-	int* sizeX = get_size(x);
+	int* sizeX = get_size(y);
 	int m = sizeX[1];
 	delete [] sizeX;
 
-	matrix xi(2, 1);
+	matrix xi(3, 1);
 	for (int i = 0; i < m; i++)
 	{
 		xi(0, 0) = x(0, i);
 		xi(1, 0) = x(1, i);
+		xi(2, 0) = x(2, i);
+
 		J = J + y(0, i) * log(h0(xi, theta)) + (1 - y(0, i)) * log(1 - h0(xi, theta));
 	}
-	J = J / (double)m;
+	J = -J * 1.0/(double)m;
 
 	return J;
 }
 
-matrix df_lab4(matrix x, matrix y, matrix theta, int j)
+matrix df_lab4(matrix theta, matrix y, matrix x)
 {
-	matrix dJ(1, 1, 0.0);
+	matrix dJ(3, 1, 0.0);
 
-	int* sizeX = get_size(x);
+	int* sizeX = get_size(y);
 	int m = sizeX[1];
 	delete[] sizeX;
 
-	matrix xi(2, 1);
-	for (int i = 0; i < m; i++)
+	matrix xi(3, 1);
+	for (int j = 0; j < 3; j++)
 	{
-		xi(0, 0) = x(0, i);
-		xi(1, 0) = x(1, i);
-		dJ = dJ + matrix((h0(xi, theta) - y(0, i)) * x(j, i));
+		for (int i = 0; i < m; i++)
+		{
+			xi(0, 0) = x(0, i);
+			xi(1, 0) = x(1, i);
+			xi(2, 0) = x(2, i);
+
+			dJ(j, 0) += (h0(xi, theta) - y(0, i)) * x(j, i);
+		}
 	}
 
 	dJ = dJ / (double)m;

@@ -561,7 +561,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			d = -Xopt.grad(gf, ud1, ud2);
 			if (h0 == -1)
 			{
-				b /= (1.0 + (double)i / (double)Nmax);
+				//b /= (1.0 + (double)i / (double)Nmax);
 				h = golden(ff, Xopt.x, d, a, b, epsilon, Nmax, ud1, ud2).x(0, 0);
 			}
 			Xopt_n.x = Xopt.x + h * d;
@@ -590,11 +590,13 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 
 		double a = 0;
 		double b = 1;
-		
-		Xopt_n.x = x0 + d*h;
+		if(h != -1)
+			Xopt_n.x = x0 + d*h;
+		else
+			Xopt_n.x = x0 + d * 0.05;
+
 		double beta = pow(norm(Xopt_n.grad(gf, ud1, ud2)) / norm(Xopt.grad(gf, ud1, ud2)), 2);
 		Xopt.x = Xopt_n.x;
-
 		for (int i = 0; i < Nmax; i++)
 		{
 			d = -Xopt.grad(gf, ud1, ud2) + beta * d;
@@ -610,6 +612,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			beta = pow(norm(Xopt_n.grad(gf, ud1, ud2)) / norm(Xopt.grad(gf, ud1, ud2)), 2);
 			Xopt = Xopt_n;
 		}
+
 		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 	}
@@ -635,7 +638,6 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 
 		for (int i = 0; i < Nmax; i++)
 		{
-			
 			d = -det(inv(Xopt.hess(Hf, ud1, ud2))) * Xopt.grad(gf, ud1, ud2);
 			if (h0 == -1)
 			{
@@ -646,6 +648,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
 			Xopt = Xopt_n;
 		}
+
 		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 
