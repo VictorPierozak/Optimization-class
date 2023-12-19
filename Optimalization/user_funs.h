@@ -22,3 +22,7 @@ matrix testowa_lab_3_zew(matrix x, matrix ud1, matrix ud2);
 matrix testowa_lab_3_wew(matrix x, matrix ud1, matrix ud2);
 matrix testowa_lab_3_wew_clear(matrix y, matrix x, matrix ud1, matrix ud2);
 matrix testowa_lab_3_clear(matrix x, matrix ud1, matrix ud2);
+matrix testowa_lab_4(matrix x, matrix ud1, matrix ud2);
+
+matrix grad_testowa_lab_4(matrix x, matrix ud1, matrix ud2);
+matrix hess_testowa_lab_4(matrix x, matrix ud1, matrix ud2);

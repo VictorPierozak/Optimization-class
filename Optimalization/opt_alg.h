@@ -22,7 +22,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, long double s, l
 solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, long double h0, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
 solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, long double h0, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
 solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix(*Hf)(matrix, matrix, matrix), matrix x0, long double h0, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
-solution golden(matrix(*ff)(matrix, matrix, matrix), long double a, long double b, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
+solution golden(matrix(*ff)(matrix, matrix, matrix), matrix x0,matrix d,long double a, long double b, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, long double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
 

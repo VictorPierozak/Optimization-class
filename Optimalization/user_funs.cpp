@@ -183,6 +183,30 @@ matrix testowa_lab_3_wew_clear(matrix y, matrix x, matrix ud1, matrix ud2)
 	return y;
 }
 
+matrix testowa_lab_4(matrix x, matrix ud1, matrix ud2)
+{
+	return pow(x(0, 0) + 2 * x(1, 0) - 7, 2) + pow(2 * x(0, 0) + x(1, 0) - 5, 2);
+}
+
+matrix grad_testowa_lab_4(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y(2, 1);
+	y(0, 0) = 2.0 * (x(0, 0) + 2.0 * x(1, 0) - 7.0) + 4.0 * (2.0 * x(0, 0) + x(1, 0) - 5.0);
+	y(1, 0) = 4.0 * (x(0, 0) + 2.0 * x(1, 0) - 7.0) + 2.0 * (2.0 * x(0, 0) + x(1, 0) - 5.0);
+	double normY = norm(y);
+	y = y / normY;
+	
+	return y;
+}
+
+matrix hess_testowa_lab_4(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y(2, 2);
+	y(0, 0) = 10;	y(1, 0) = 8;
+	y(0, 1) = 8;	y(1, 1) = 10;
+	return y;
+}
+
 matrix df3(long double t, matrix y, matrix ud1, matrix ud2)
 {
 	matrix dy(4, 1);
@@ -242,4 +266,51 @@ matrix ff_lab3(matrix x, matrix ud1, matrix ud2)
 	delete[] y;
 
 	return res*(-1);
+}
+
+double h0(matrix x, matrix theta)
+{
+	return 1 / (1 + exp(-(trans(theta) * x)(0, 0)));
+}
+
+
+matrix ff_lab4(matrix x, matrix y, matrix theta)
+{
+	matrix J(1, 1, 0.0);
+
+	int* sizeX = get_size(x);
+	int m = sizeX[1];
+	delete [] sizeX;
+
+	matrix xi(2, 1);
+	for (int i = 0; i < m; i++)
+	{
+		xi(0, 0) = x(0, i);
+		xi(1, 0) = x(1, i);
+		J = J + y(0, i) * log(h0(xi, theta)) + (1 - y(0, i)) * log(1 - h0(xi, theta));
+	}
+	J = J / (double)m;
+
+	return J;
+}
+
+matrix df_lab4(matrix x, matrix y, matrix theta, int j)
+{
+	matrix dJ(1, 1, 0.0);
+
+	int* sizeX = get_size(x);
+	int m = sizeX[1];
+	delete[] sizeX;
+
+	matrix xi(2, 1);
+	for (int i = 0; i < m; i++)
+	{
+		xi(0, 0) = x(0, i);
+		xi(1, 0) = x(1, i);
+		dJ = dJ + matrix((h0(xi, theta) - y(0, i)) * x(j, i));
+	}
+
+	dJ = dJ / (double)m;
+
+	return dJ;
 }

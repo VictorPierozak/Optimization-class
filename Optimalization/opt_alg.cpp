@@ -549,8 +549,26 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution Xopt_n;
+		Xopt.x = x0;
+		matrix d(2,1);
+		double h = h0;
+		double a = 0;
+		double b = 1;
 
+		for (int i = 0; i < Nmax; i++)
+		{
+			d = -Xopt.grad(gf, ud1, ud2);
+			if (h0 == -1)
+			{
+				b /= (1.0 + (double)i / (double)Nmax);
+				h = golden(ff, Xopt.x, d, a, b, epsilon, Nmax, ud1, ud2).x(0, 0);
+			}
+			Xopt_n.x = Xopt.x + h * d;
+			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
+			Xopt = Xopt_n;
+		}
+		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -564,8 +582,35 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution Xopt_n;
+		Xopt.x = x0;
+		matrix d = -gf(Xopt.x, ud1, ud2);
 
+		double h = h0;
+
+		double a = 0;
+		double b = 1;
+		
+		Xopt_n.x = x0 + d*h;
+		double beta = pow(norm(Xopt_n.grad(gf, ud1, ud2)) / norm(Xopt.grad(gf, ud1, ud2)), 2);
+		Xopt.x = Xopt_n.x;
+
+		for (int i = 0; i < Nmax; i++)
+		{
+			d = -Xopt.grad(gf, ud1, ud2) + beta * d;
+			if (h0 == -1)
+			{
+				b /= (1.0 + (double)i / (double)Nmax);
+				h = golden(ff, Xopt.x, d, a, b, epsilon, Nmax, ud1, ud2).x(0, 0);
+			}
+			Xopt_n.x = Xopt.x + h * d;
+
+			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
+
+			beta = pow(norm(Xopt_n.grad(gf, ud1, ud2)) / norm(Xopt.grad(gf, ud1, ud2)), 2);
+			Xopt = Xopt_n;
+		}
+		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -580,9 +625,30 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution Xopt_n;
+		Xopt.x = x0;
+		matrix d = 0;
+		double h = h0;
 
+		double a = 0;
+		double b = 1;
+
+		for (int i = 0; i < Nmax; i++)
+		{
+			
+			d = -det(inv(Xopt.hess(Hf, ud1, ud2))) * Xopt.grad(gf, ud1, ud2);
+			if (h0 == -1)
+			{
+				//b /= (1.0 + (double)i / (double)Nmax);
+				h = golden(ff, Xopt.x, d, a, b, epsilon, Nmax, ud1, ud2).x(0, 0);
+			}
+			Xopt_n.x = Xopt.x + h * d;
+			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
+			Xopt = Xopt_n;
+		}
+		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
+
 	}
 	catch (string ex_info)
 	{
@@ -590,12 +656,38 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	}
 }
 
-solution golden(matrix(*ff)(matrix, matrix, matrix), long double a, long double b, long double epsilon, int Nmax, matrix ud1, matrix ud2)
+solution golden(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix grad, long double a, long double b, long double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int i = 0;
+		double alpha = (pow(5, 0.5) - 1) / 2;
+		double c = b - alpha * (b - a);
+		double d = a + alpha*(b-a);
+
+		// Repeat the following steps until the convergence criterion is met
+		while (abs(b - a) > epsilon) {
+			if (ff(x0 + grad*c, ud1, ud2) < ff(x0 + grad*d, ud1, ud2)) 
+			{
+				c = b - alpha * (b - a);
+				a = a;
+				b = d;
+				d = c;
+			}
+			else {
+				a = c;
+				b = b;
+				c = d;
+				d = a + alpha * (b - a);
+			}
+
+			i++;
+			if (i > Nmax) break;
+		}
+
+		// Calculate the optimal solution
+		Xopt.x = (a + b) / 2;
 
 		return Xopt;
 	}

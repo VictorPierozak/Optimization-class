@@ -22,7 +22,7 @@ int main()
 {
 	try
 	{
-		lab3();
+		lab4();
 	}
 	catch (string EX_INFO)
 	{
@@ -319,8 +319,8 @@ void lab3()
 	opt_min.y = 10e5;
 
 		// Wywo³anie funkcji algorytmu //
-	x0(1, 0) = 8; ((float)std::rand() / (float)RAND_MAX) * 46 - 23;
-	x0(0, 0) = -1;  ((float)std::rand() / (float)RAND_MAX) * 20 - 10;
+	x0(1, 0) = ((float)std::rand() / (float)RAND_MAX) * 46 - 23;
+	x0(0, 0) =  ((float)std::rand() / (float)RAND_MAX) * 20 - 10;
 		ud2(0) = 10e4;
 		std::cout << x0(0, 0) << ' ' << x0(1, 0) << std::endl;
 		solution::clear_calls();
@@ -363,6 +363,75 @@ void lab3()
 
 void lab4()
 {
+	// FUNCKJA TESTOWA //
+
+	solution opt;
+	srand(time(NULL));
+	matrix x0(2, 1);
+
+	double upper_X = 10;
+	double lower_X = -10;
+	double upper_Y = 10;
+	double lower_Y = -10;
+
+	double epsilon = 0.0001;
+	int Nmax = 10000;
+	double h0[3] = { 0.05, 0.12, -1.0 };
+
+	x0(0, 0) = (double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
+	x0(1, 0) = (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
+	
+
+	solution::clear_calls();
+	opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
+	std::cout << "SD:\n" << opt;
+
+	solution::clear_calls();
+	opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
+	std::cout << "CG:\n" << opt;
+
+	solution::clear_calls();
+	opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, -1, epsilon, Nmax);
+	std::cout << "Newton:\n" << opt;
+
+	bool raport = false;
+	std::ofstream file;
+
+	if (raport)
+	{
+		file.open("funkcja_testowa.txt");
+
+		for (int i = 0; i < 3; i++)
+		{
+			for (int k = 0; k < 100; k++)
+			{
+				x0(0, 0) = (double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
+				x0(1, 0) = (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
+				file << x0(0, 0) << '\t' << x0(1, 0) << '\t';
+
+				solution::clear_calls();
+				opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, h0[i], epsilon, Nmax);
+				//std::cout << "SD:\n" << opt;
+				file << opt.x(0, 0) << '\t' << opt.x(1, 0) << '\t' << opt.y << '\t' << opt.f_calls << '\t' << opt.g_calls << '\t';
+
+				solution::clear_calls();
+				opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, h0[i], epsilon, Nmax);
+				//std::cout << "CG:\n" << opt;
+				file << opt.x(0, 0) << '\t' << opt.x(1, 0) << '\t' << opt.y << '\t' << opt.f_calls << '\t' << opt.g_calls << '\t';
+
+				solution::clear_calls();
+				opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, h0[i], epsilon, Nmax);
+				//std::cout << "Newton:\n" << opt;
+				file << opt.x(0, 0) << '\t' << opt.x(1, 0) << '\t' << opt.y << '\t' << opt.f_calls << '\t' << opt.g_calls << '\t' << opt.H_calls << std::endl;
+
+			}
+		}
+		file.close();
+	}
+
+	// PROBLEM RZECZYWISTY //
+
+	matrix theta_0(3, 1, 0.0);
 
 }
 
