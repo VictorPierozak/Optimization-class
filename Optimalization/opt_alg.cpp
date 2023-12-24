@@ -548,16 +548,20 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 {
 	try
 	{
+		std::ofstream file;
+		file.open("SD_zbieznosc.txt");
+
 		solution Xopt;
 		solution Xopt_n;
 		Xopt.x = x0;
 		matrix d(2,1);
 		double h = h0;
 		double a = 0;
-		double b = 1;
+		double b = 0.05;
 
 		for (int i = 0; i < Nmax; i++)
 		{
+			file << Xopt.x(0, 0) << '\t' << Xopt.x(1, 0) << std::endl;
 			d = -Xopt.grad(gf, ud1, ud2);
 			if (h0 == -1)
 			{
@@ -568,6 +572,8 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
 			Xopt = Xopt_n;
 		}
+		file.close();
+
 		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 	}
@@ -581,6 +587,9 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 {
 	try
 	{
+		std::ofstream file;
+		file.open("CG_zbieznosc.txt");
+
 		solution Xopt;
 		solution Xopt_n;
 		Xopt.x = x0;
@@ -589,7 +598,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		double h = h0;
 
 		double a = 0;
-		double b = 1;
+		double b = 0.05;
 		if(h != -1)
 			Xopt_n.x = x0 + d*h;
 		else
@@ -599,10 +608,11 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		Xopt.x = Xopt_n.x;
 		for (int i = 0; i < Nmax; i++)
 		{
+			file << Xopt.x(0, 0) << '\t' << Xopt.x(1, 0) << std::endl;
 			d = -Xopt.grad(gf, ud1, ud2) + beta * d;
 			if (h0 == -1)
 			{
-				b /= (1.0 + (double)i / (double)Nmax);
+				//b /= (1.0 + (double)i / (double)Nmax);
 				h = golden(ff, Xopt.x, d, a, b, epsilon, Nmax, ud1, ud2).x(0, 0);
 			}
 			Xopt_n.x = Xopt.x + h * d;
@@ -612,6 +622,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			beta = pow(norm(Xopt_n.grad(gf, ud1, ud2)) / norm(Xopt.grad(gf, ud1, ud2)), 2);
 			Xopt = Xopt_n;
 		}
+		file.close();
 
 		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
@@ -627,6 +638,9 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 {
 	try
 	{
+		std::ofstream file;
+		file.open("Newton_zbieznosc.txt");
+
 		solution Xopt;
 		solution Xopt_n;
 		Xopt.x = x0;
@@ -638,6 +652,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 
 		for (int i = 0; i < Nmax; i++)
 		{
+			file << Xopt.x(0, 0) << '\t' << Xopt.x(1, 0) << std::endl;
 			d = -det(inv(Xopt.hess(Hf, ud1, ud2))) * Xopt.grad(gf, ud1, ud2);
 			if (h0 == -1)
 			{
@@ -648,6 +663,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			if (norm(Xopt_n.x - Xopt.x) < epsilon) break;
 			Xopt = Xopt_n;
 		}
+		file.close();
 
 		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;

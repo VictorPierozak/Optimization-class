@@ -193,8 +193,8 @@ matrix grad_testowa_lab_4(matrix x, matrix ud1, matrix ud2)
 	matrix y(2, 1);
 	y(0, 0) = 2.0 * (x(0, 0) + 2.0 * x(1, 0) - 7.0) + 4.0 * (2.0 * x(0, 0) + x(1, 0) - 5.0);
 	y(1, 0) = 4.0 * (x(0, 0) + 2.0 * x(1, 0) - 7.0) + 2.0 * (2.0 * x(0, 0) + x(1, 0) - 5.0);
-	double normY = norm(y);
-	y = y / normY;
+	//double normY = norm(y);
+	//y = y / normY;
 	
 	return y;
 }

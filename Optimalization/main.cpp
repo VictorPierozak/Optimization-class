@@ -376,25 +376,28 @@ void lab4()
 	double upper_Y = 10;
 	double lower_Y = -10;
 
-	double epsilon = 0.0001;
+	double epsilon = 0.001;
 	int Nmax = 1000;
 	double h0[3] = { 0.05, 0.12, -1.0 };
 
-	x0(0, 0) = -3.19864; //(double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
-	x0(1, 0) = -9.02341; // (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
+	x0(0, 0) = (double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
+	x0(1, 0) = (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
 	
+	bool convergence = true;
+	if (convergence)
+	{
+		solution::clear_calls();
+		opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		std::cout << "SD:\n" << opt;
 
-	solution::clear_calls();
-	opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
-	std::cout << "SD:\n" << opt;
+		solution::clear_calls();
+		opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		std::cout << "CG:\n" << opt;
 
-	solution::clear_calls();
-	opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
-	std::cout << "CG:\n" << opt;
-
-	solution::clear_calls();
-	opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, -1, epsilon, Nmax);
-	std::cout << "Newton:\n" << opt;
+		solution::clear_calls();
+		opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		std::cout << "Newton:\n" << opt;
+	}
 
 	bool raport = false;
 	std::ofstream file;
@@ -432,42 +435,42 @@ void lab4()
 	}
 
 	// PROBLEM RZECZYWISTY //
-
-	matrix theta_0(3, 1, 0.0);
-	matrix X = readX("XData.txt");
-	matrix Y = readY("YData.txt");
-	int* size = get_size(Y);
-	int m = size[1];
-	delete [] size;
-
-	h0[0] = 0.01;
-	h0[1] = 0.001;
-	h0[2] = 0.0001;
-	epsilon = 10e-5;
-	Nmax = 10000;
-	/*for (int i = 0; i < 3; i++)
+	bool real = false;
+	if (real)
 	{
-		//solution::clear_calls();
-		//opt = SD(ff_lab4, df_lab4, theta_0, h0[i], epsilon, Nmax, Y, X);
-		//std::cout << std::endl << "SD: " << opt << std::endl;
 
-		solution::clear_calls();
-		opt = CG(ff_lab4, df_lab4, theta_0, h0[i], epsilon, Nmax, Y, X);
-		std::cout << std::endl << "CG: " << opt << std::endl;
+		matrix theta_0(3, 1, 0.0);
+		matrix X = readX("XData.txt");
+		matrix Y = readY("YData.txt");
+		int* size = get_size(Y);
+		int m = size[1];
+		delete[] size;
 
-		double P = 0;
-		matrix xi(3, 1);
-		matrix theta_trans = trans(opt.x);
-		for (int i = 0; i < m; i++)
+		h0[0] = 0.01;
+		h0[1] = 0.001;
+		h0[2] = 0.0001;
+		epsilon = 10e-6;
+		Nmax = 10000;
+		for (int i = 0; i < 3; i++)
 		{
-			xi(0, 0) = X(0, i);
-			xi(1, 0) = X(1, i);
-			xi(2, 0) = X(2, i);
-			P += ( round( 1 / (1 + exp((- theta_trans * xi)(0, 0))) ) ==  Y(0,i));
+			solution::clear_calls();
+			opt = CG(ff_lab4, df_lab4, theta_0, h0[i], epsilon, Nmax, Y, X);
+			std::cout << std::endl << "CG: " << opt << std::endl;
+
+			double P = 0;
+			matrix xi(3, 1);
+			matrix theta_trans = trans(opt.x);
+			for (int i = 0; i < m; i++)
+			{
+				xi(0, 0) = X(0, i);
+				xi(1, 0) = X(1, i);
+				xi(2, 0) = X(2, i);
+				P += (round(1 / (1 + exp((-theta_trans * xi)(0, 0)))) == Y(0, i));
+			}
+			P /= m;
+			std::cout << "P: " << P << std::endl;
 		}
-		P /= m;
-		std::cout << "P: " << P << std::endl;
-	}*/
+	}
 }
 
 void lab5()
@@ -484,7 +487,7 @@ void lab6()
 
 matrix readX(std::string filename)
 {
-	struct X_e { int x1; int x2; };
+	struct X_e { int x1; int x2; int x3; };
 
 	std::ifstream file;
 	file.open(filename.c_str());
@@ -494,23 +497,29 @@ matrix readX(std::string filename)
 	}
 
 	std::vector< X_e> X_vec;
-	X_e tmp;
-	int m = 0;
+	std::string line;
+	std::vector<int> x[3];
+	int tmp;
 
-	while (file.eof() == false)
+	for (int i = 0; i < 3; i++)
 	{
-		m++;
-		file >> tmp.x1; file.ignore(); file >> tmp.x2; file.ignore();
-		X_vec.push_back(tmp);
+		getline(file, line);
+		std::stringstream ss(line);
+		while (ss.eof() == false)
+		{
+			ss >> tmp; ss.ignore();
+			x[i].push_back(tmp);
+		}
 	}
+
 	file.close();
 
-	matrix X(3, m);
-	for (int i = 0; i < m; i++)
+	matrix X(3, x[0].size());
+	for (int i = 0; i < x[0].size(); i++)
 	{
-		X(0, i) = 1;
-		X(1, i) = X_vec[i].x1;
-		X(2, i) = X_vec[i].x2;
+		X(0, i) = x[0][i];
+		X(1, i) = x[1][i];
+		X(2, i) = x[2][i];
 	}
 
 	return X;
