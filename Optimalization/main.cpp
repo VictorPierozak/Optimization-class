@@ -380,33 +380,33 @@ void lab4()
 	int Nmax = 1000;
 	double h0[3] = { 0.05, 0.12, -1.0 };
 
-	x0(0, 0) = (double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
-	x0(1, 0) = (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
+	x0(0, 0) = 2; (double)std::rand() / (double)RAND_MAX * (upper_X - lower_X) + lower_X;
+	x0(1, 0) = -8; (double)std::rand() / (double)RAND_MAX * (upper_Y - lower_Y) + lower_Y;
 	
 	bool convergence = true;
 	if (convergence)
 	{
 		solution::clear_calls();
-		opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		opt = SD(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
 		std::cout << "SD:\n" << opt;
 
 		solution::clear_calls();
-		opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		opt = CG(testowa_lab_4, grad_testowa_lab_4, x0, -1, epsilon, Nmax);
 		std::cout << "CG:\n" << opt;
 
 		solution::clear_calls();
-		opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, 0.05, epsilon, Nmax);
+		opt = Newton(testowa_lab_4, grad_testowa_lab_4, hess_testowa_lab_4, x0, -1, epsilon, Nmax);
 		std::cout << "Newton:\n" << opt;
 	}
 
-	bool raport = false;
+	bool raport = true;
 	std::ofstream file;
 
 	if (raport)
 	{
 		file.open("funkcja_testowa.txt");
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 2; i < 3; i++)
 		{
 			for (int k = 0; k < 100; k++)
 			{
@@ -550,7 +550,7 @@ matrix readY(std::string filename)
 	for (int i = 0; i < m; i++)
 	{
 		Y(0, i) = Y_vec[i];
-	}
+	}  
 
 	return Y;
 }
